@@ -36,13 +36,6 @@ st.set_page_config(
 def format_currency(value: float | None) -> str:
     """
     Format numeric values as euros for display.
-
-    Args:
-        value:
-            Numeric value to format.
-
-    Returns:
-        Formatted euro string.
     """
 
     if value is None:
@@ -54,13 +47,6 @@ def format_currency(value: float | None) -> str:
 def format_percentage(value: float | None) -> str:
     """
     Format numeric values as percentages for display.
-
-    Args:
-        value:
-            Numeric value to format.
-
-    Returns:
-        Formatted percentage string.
     """
 
     if value is None:
@@ -69,23 +55,231 @@ def format_percentage(value: float | None) -> str:
     return f"{value:.2f}%"
 
 
-st.title("DSTI Affordability Calculator")
+def render_header() -> None:
+    """
+    Render the premium application header.
+    """
 
-st.caption(
-    "Banking-inspired financial affordability and DSTI simulation tool focused "
-    "on financial literacy, data validation, explainability and risk awareness."
+    st.markdown(
+        """
+        <div class="hero-section">
+            <div class="hero-label">Wisestrike Finance Lab</div>
+            <h1>DSTI Affordability Calculator</h1>
+            <p>
+                Banking-inspired financial affordability and DSTI simulation tool
+                focused on financial literacy, data validation, explainability
+                and risk awareness.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_metric_card(title: str, value: str, subtitle: str) -> None:
+    """
+    Render a styled metric card.
+    """
+
+    st.markdown(
+        f"""
+        <div class="metric-card">
+            <div class="metric-title">{title}</div>
+            <div class="metric-value">{value}</div>
+            <div class="metric-subtitle">{subtitle}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_section_title(title: str, description: str) -> None:
+    """
+    Render a styled section heading.
+    """
+
+    st.markdown(
+        f"""
+        <div class="section-title">
+            <h2>{title}</h2>
+            <p>{description}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+st.markdown(
+    """
+    <style>
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+            max-width: 1320px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #0F3D5E 0%, #17324D 100%);
+            padding: 2.4rem 2.2rem;
+            border-radius: 24px;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 12px 32px rgba(15, 61, 94, 0.18);
+        }
+
+        .hero-section h1 {
+            font-size: 2.4rem;
+            margin-bottom: 0.6rem;
+            color: white;
+        }
+
+        .hero-section p {
+            font-size: 1.05rem;
+            max-width: 880px;
+            line-height: 1.6;
+            color: #E8F1F8;
+        }
+
+        .hero-label {
+            display: inline-block;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            margin-bottom: 0.9rem;
+            color: #D8E8F4;
+        }
+
+        .disclaimer-box {
+            background: #FFF8E8;
+            border: 1px solid #F2D28A;
+            border-left: 6px solid #C58A1A;
+            padding: 1rem 1.2rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            color: #4B3A13;
+            line-height: 1.55;
+        }
+
+        .section-title {
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .section-title h2 {
+            font-size: 1.35rem;
+            margin-bottom: 0.25rem;
+            color: #1B2430;
+        }
+
+        .section-title p {
+            color: #5B6875;
+            margin-bottom: 0;
+        }
+
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 1.25rem 1.15rem;
+            box-shadow: 0 8px 24px rgba(15, 61, 94, 0.07);
+            min-height: 132px;
+        }
+
+        .metric-title {
+            font-size: 0.82rem;
+            color: #5B6875;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.55rem;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0F3D5E;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-subtitle {
+            font-size: 0.9rem;
+            color: #64748B;
+            line-height: 1.35;
+        }
+
+        .summary-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 1.25rem 1.35rem;
+            line-height: 1.65;
+            color: #263442;
+            margin-bottom: 1rem;
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            background: #F3F6F9;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            color: #5B6875;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        div[data-testid="stMetric"] {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            padding: 1rem;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(15, 61, 94, 0.06);
+        }
+
+        section[data-testid="stSidebar"] {
+            background-color: #F3F6F9;
+        }
+
+        .stDataFrame {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
-st.warning(
-    "Educational simulation only. This tool does not approve or reject credit, "
-    "does not provide financial advice and does not replace formal banking "
-    "analysis. Use fictional, simulated or anonymised values only."
+
+render_header()
+
+st.markdown(
+    """
+    <div class="disclaimer-box">
+        <strong>Educational simulation only.</strong>
+        This tool does not approve or reject credit, does not provide financial advice,
+        does not replace formal banking analysis and does not represent any bank's
+        internal credit policy. Use fictional, simulated or anonymised values only.
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
+
 
 with st.sidebar:
     st.header("Simulation Inputs")
 
+    st.caption(
+        "Use fictional, simulated or anonymised values only. "
+        "Do not enter real personal or sensitive financial data."
+    )
+
+    st.divider()
+
     st.subheader("Income")
+
     income_source_1 = st.number_input(
         "Monthly net income — Source 1 (€)",
         min_value=0.0,
@@ -113,7 +307,10 @@ with st.sidebar:
         step=0.01,
     )
 
+    st.divider()
+
     st.subheader("Credit Commitments")
+
     existing_monthly_commitments = st.number_input(
         "Existing monthly credit commitments (€)",
         min_value=0.0,
@@ -143,7 +340,10 @@ with st.sidebar:
         step=1.0,
     )
 
+    st.divider()
+
     st.subheader("Optional LTV Inputs")
+
     include_ltv = st.checkbox("Include LTV simulation", value=True)
 
     if include_ltv:
@@ -187,7 +387,10 @@ with st.sidebar:
         configured_ltv_threshold_percentage = None
         use_lower_property_value = True
 
+    st.divider()
+
     st.subheader("Optional Maturity Inputs")
+
     include_maturity = st.checkbox("Include maturity simulation", value=True)
 
     if include_maturity:
@@ -238,9 +441,21 @@ scenario = run_affordability_scenario(
     configured_maximum_age_at_end=configured_maximum_age_at_end,
 )
 
-st.header("Simulation Summary")
 
-st.write(scenario.summary)
+render_section_title(
+    "Simulation Summary",
+    "Indicative educational output based on the configured fictional assumptions.",
+)
+
+st.markdown(
+    f"""
+    <div class="summary-card">
+        {scenario.summary}
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 if not scenario.validation.is_valid:
     st.error("Blocking validation errors were identified.")
@@ -252,30 +467,37 @@ else:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric(
+        render_metric_card(
             "Monthly Net Income",
             format_currency(scenario.income.monthly_net_income),
+            "Selected income assumption used in this simulation.",
         )
 
     with col2:
-        st.metric(
+        render_metric_card(
             "Base DSTI",
             format_percentage(scenario.dsti.base_dsti_percentage),
+            "Debt service using the proposed instalment.",
         )
 
     with col3:
-        st.metric(
+        render_metric_card(
             "Stressed DSTI",
             format_percentage(scenario.dsti.stressed_dsti_percentage),
+            "Debt service using the stressed instalment.",
         )
 
     with col4:
-        st.metric(
+        render_metric_card(
             "Remaining Capacity",
             format_currency(scenario.dsti.remaining_repayment_capacity),
+            "Indicative margin before the configured DSTI threshold.",
         )
 
-    st.subheader("DSTI Details")
+    render_section_title(
+        "DSTI Details",
+        "Breakdown of base, stressed and capacity-related affordability indicators.",
+    )
 
     dsti_table = pd.DataFrame(
         [
@@ -310,32 +532,42 @@ else:
         ]
     )
 
-    st.dataframe(dsti_table, use_container_width=True)
+    st.dataframe(dsti_table, use_container_width=True, hide_index=True)
 
     if scenario.ltv is not None:
-        st.subheader("LTV Details")
-
-        ltv_table = pd.DataFrame(
-            [
-                {
-                    "Metric": "Loan amount",
-                    "Value": format_currency(scenario.ltv.loan_amount),
-                },
-                {
-                    "Metric": "Property value used",
-                    "Value": format_currency(scenario.ltv.property_value_used),
-                },
-                {
-                    "Metric": "Simulated LTV",
-                    "Value": format_percentage(scenario.ltv.ltv_percentage),
-                },
-            ]
+        render_section_title(
+            "LTV Details",
+            "Loan-to-Value simulation based on the selected property value assumption.",
         )
 
-        st.dataframe(ltv_table, use_container_width=True)
+        ltv_col1, ltv_col2, ltv_col3 = st.columns(3)
+
+        with ltv_col1:
+            render_metric_card(
+                "Loan Amount",
+                format_currency(scenario.ltv.loan_amount),
+                "Simulated loan amount.",
+            )
+
+        with ltv_col2:
+            render_metric_card(
+                "Property Value Used",
+                format_currency(scenario.ltv.property_value_used),
+                "Selected property value assumption.",
+            )
+
+        with ltv_col3:
+            render_metric_card(
+                "Simulated LTV",
+                format_percentage(scenario.ltv.ltv_percentage),
+                "Educational Loan-to-Value indicator.",
+            )
 
     if scenario.maturity is not None:
-        st.subheader("Maturity Details")
+        render_section_title(
+            "Maturity Details",
+            "Age and maturity assumptions used for risk awareness.",
+        )
 
         maturity_table = pd.DataFrame(
             [
@@ -358,9 +590,12 @@ else:
             ]
         )
 
-        st.dataframe(maturity_table, use_container_width=True)
+        st.dataframe(maturity_table, use_container_width=True, hide_index=True)
 
-    st.subheader("Validation Notes")
+    render_section_title(
+        "Validation Notes",
+        "Financial data quality checks applied before interpreting the simulation.",
+    )
 
     if scenario.validation.warnings:
         st.warning("Non-blocking validation warnings were identified.")
@@ -374,7 +609,10 @@ else:
         for message in scenario.validation.info_messages:
             st.write(f"- {message}")
 
-    st.subheader("Scenario Comparison Example")
+    render_section_title(
+        "Scenario Comparison",
+        "Comparison between the base simulation and a prudent income scenario.",
+    )
 
     prudent_scenario = run_affordability_scenario(
         scenario_name="Prudent income simulation",
@@ -399,12 +637,29 @@ else:
         compare_scenarios([scenario, prudent_scenario])
     )
 
-    st.dataframe(comparison_table, use_container_width=True)
+    st.dataframe(comparison_table, use_container_width=True, hide_index=True)
 
-st.divider()
+    with st.expander("Methodology and limitations"):
+        st.write(
+            "This simulation uses simplified assumptions and does not verify "
+            "income, credit history, employment stability, property valuation, "
+            "legal documentation, regulatory requirements or bank-specific "
+            "credit policy."
+        )
+        st.write(
+            "The outputs are educational and indicative only. They must not be "
+            "interpreted as credit approval, rejection, eligibility confirmation "
+            "or financial advice."
+        )
 
-st.caption(
-    "This project is educational and demonstrative. It does not use real client "
-    "data, does not process personal documents and does not represent any "
-    "bank's internal credit policy."
+st.markdown(
+    """
+    <div class="footer-note">
+        This project is educational and demonstrative. It does not use real client
+        data, does not process personal documents, does not perform OCR and does
+        not represent any bank's internal credit policy. All values should be
+        fictional, simulated or anonymised.
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
