@@ -1,0 +1,11 @@
+scenario_name,monthly_net_income_source_1,monthly_net_income_source_2,use_conservative_income,conservative_factor,existing_monthly_commitments,proposed_monthly_instalment,stressed_monthly_instalment,configured_dsti_threshold_percentage,loan_amount,acquisition_value,valuation_value,configured_ltv_threshold_percentage,use_lower_property_value,loan_maturity_years,current_age,configured_maximum_age_at_end,notes
+Base simulation,1500,1000,False,0.90,300,650,780,40,180000,220000,215000,90,True,30,35,75,Fictional base household affordability scenario
+Prudent income simulation,1500,1000,True,0.90,300,650,780,40,180000,220000,215000,90,True,30,35,75,Fictional scenario using conservative income assumption
+Higher commitment scenario,1500,1000,False,0.90,600,650,780,40,180000,220000,215000,90,True,30,35,75,Fictional scenario with higher existing monthly commitments
+Higher stress scenario,1500,1000,False,0.90,300,650,900,40,180000,220000,215000,90,True,30,35,75,Fictional scenario with higher stressed instalment
+Lower income scenario,1200,800,False,0.90,300,650,780,40,180000,220000,215000,90,True,30,35,75,Fictional scenario with lower household income
+Higher LTV scenario,1500,1000,False,0.90,300,650,780,40,210000,220000,215000,90,True,30,35,75,Fictional scenario with higher simulated LTV
+Longer maturity scenario,1500,1000,False,0.90,300,650,780,40,180000,220000,215000,90,True,40,35,75,Fictional scenario with longer maturity assumption
+Older borrower scenario,1500,1000,False,0.90,300,650,780,40,180000,220000,215000,90,True,30,55,75,Fictional maturity risk awareness scenario
+High DSTI scenario,1500,1000,False,0.90,500,900,1100,40,180000,220000,215000,90,True,30,35,75,Fictional scenario designed to trigger DSTI risk warnings
+Data quality review scenario,2500,0,False,0.90,300,650,600,40,180000,220000,215000,90,True,30,35,75,Fictional scenario where stressed instalment is lower than base instalment
