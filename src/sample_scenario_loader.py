@@ -22,6 +22,11 @@ REQUIRED_SAMPLE_SCENARIO_COLUMNS = {
     "income_source_2",
     "use_conservative_income",
     "conservative_factor",
+    "housing_commitment",
+    "auto_loan_commitment",
+    "personal_loan_commitment",
+    "credit_card_commitment",
+    "other_credit_commitments",
     "existing_monthly_commitments",
     "loan_amount",
     "loan_maturity_years",
@@ -39,10 +44,32 @@ REQUIRED_SAMPLE_SCENARIO_COLUMNS = {
 }
 
 
+STRUCTURED_COMMITMENT_COLUMNS = {
+    "housing_commitment",
+    "auto_loan_commitment",
+    "personal_loan_commitment",
+    "credit_card_commitment",
+    "other_credit_commitments",
+}
+
+
 @dataclass
 class SampleScenarioValidationResult:
     """
     Stores validation results for the sample scenario dataset.
+
+    Attributes:
+        is_valid:
+            Indicates whether the sample scenario dataset passed validation.
+
+        missing_columns:
+            Required columns missing from the dataset.
+
+        row_count:
+            Number of rows in the dataset.
+
+        interpretation:
+            Educational interpretation of the validation result.
     """
 
     is_valid: bool
@@ -77,8 +104,10 @@ def load_sample_scenarios(file_path: str | Path | None = None) -> pd.DataFrame:
             If the sample scenario file does not exist.
     """
 
-    scenario_path = Path(file_path) if file_path is not None else (
-        get_default_sample_scenarios_path()
+    scenario_path = (
+        Path(file_path)
+        if file_path is not None
+        else get_default_sample_scenarios_path()
     )
 
     if not scenario_path.exists():
@@ -102,9 +131,7 @@ def validate_sample_scenarios_columns(
     """
 
     available_columns = set(sample_scenarios.columns)
-    missing_columns = sorted(
-        REQUIRED_SAMPLE_SCENARIO_COLUMNS - available_columns
-    )
+    missing_columns = sorted(REQUIRED_SAMPLE_SCENARIO_COLUMNS - available_columns)
 
     is_valid = len(missing_columns) == 0
     row_count = len(sample_scenarios)
@@ -123,9 +150,10 @@ def validate_sample_scenarios_columns(
         is_valid = False
     else:
         interpretation = (
-            "The sample scenario dataset contains the required columns and can "
-            "be used for educational scenario demonstration. Values should "
-            "remain fictional, simulated or anonymised."
+            "The sample scenario dataset contains the required columns, including "
+            "structured commitments fields, and can be used for educational "
+            "scenario demonstration. Values should remain fictional, simulated "
+            "or anonymised."
         )
 
     return SampleScenarioValidationResult(
@@ -133,6 +161,66 @@ def validate_sample_scenarios_columns(
         missing_columns=missing_columns,
         row_count=row_count,
         interpretation=interpretation,
+    )
+
+
+def validate_structured_commitments_consistency(
+    sample_scenarios: pd.DataFrame,
+) -> SampleScenarioValidationResult:
+    """
+    Validate consistency between structured commitment columns and total
+    existing monthly commitments.
+
+    Args:
+        sample_scenarios:
+            DataFrame containing sample scenario rows.
+
+    Returns:
+        SampleScenarioValidationResult object.
+    """
+
+    column_validation = validate_sample_scenarios_columns(sample_scenarios)
+
+    if not column_validation.is_valid:
+        return column_validation
+
+    inconsistent_rows = []
+
+    for index, row in sample_scenarios.iterrows():
+        structured_total = (
+            row["housing_commitment"]
+            + row["auto_loan_commitment"]
+            + row["personal_loan_commitment"]
+            + row["credit_card_commitment"]
+            + row["other_credit_commitments"]
+        )
+
+        declared_total = row["existing_monthly_commitments"]
+
+        if round(float(structured_total), 2) != round(float(declared_total), 2):
+            inconsistent_rows.append(index)
+
+    if inconsistent_rows:
+        return SampleScenarioValidationResult(
+            is_valid=False,
+            missing_columns=[],
+            row_count=len(sample_scenarios),
+            interpretation=(
+                "Data quality warning: one or more sample scenarios have "
+                "inconsistent structured commitments totals. The sum of the "
+                "commitment categories should equal existing_monthly_commitments."
+            ),
+        )
+
+    return SampleScenarioValidationResult(
+        is_valid=True,
+        missing_columns=[],
+        row_count=len(sample_scenarios),
+        interpretation=(
+            "Structured commitments are consistent across the sample scenario "
+            "dataset. The sum of commitment categories matches "
+            "existing_monthly_commitments for all rows."
+        ),
     )
 
 
@@ -160,6 +248,8 @@ def load_and_validate_sample_scenarios(
 
 if __name__ == "__main__":
     scenarios, validation = load_and_validate_sample_scenarios()
+    commitments_validation = validate_structured_commitments_consistency(scenarios)
 
     print(scenarios.head())
     print(validation)
+    print(commitments_validation)
