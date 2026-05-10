@@ -24,10 +24,12 @@ if str(SRC_PATH) not in sys.path:
 
 from sample_scenario_loader import (
     REQUIRED_SAMPLE_SCENARIO_COLUMNS,
+    STRUCTURED_COMMITMENT_COLUMNS,
     get_default_sample_scenarios_path,
     load_and_validate_sample_scenarios,
     load_sample_scenarios,
     validate_sample_scenarios_columns,
+    validate_structured_commitments_consistency,
 )
 
 
@@ -44,6 +46,11 @@ def build_valid_sample_scenarios_dataframe() -> pd.DataFrame:
                 "income_source_2": 1000,
                 "use_conservative_income": False,
                 "conservative_factor": 0.90,
+                "housing_commitment": 0,
+                "auto_loan_commitment": 150,
+                "personal_loan_commitment": 100,
+                "credit_card_commitment": 50,
+                "other_credit_commitments": 0,
                 "existing_monthly_commitments": 300,
                 "loan_amount": 180000,
                 "loan_maturity_years": 30,
@@ -59,7 +66,7 @@ def build_valid_sample_scenarios_dataframe() -> pd.DataFrame:
                 "configured_maximum_age_at_end": 75,
                 "scenario_note": (
                     "Standard fictional scenario used to demonstrate DSTI, "
-                    "LTV, maturity and interest rate stress."
+                    "LTV, maturity, commitments analysis and interest rate stress."
                 ),
             }
         ]
@@ -68,10 +75,26 @@ def build_valid_sample_scenarios_dataframe() -> pd.DataFrame:
 
 def test_required_sample_scenario_columns_contains_expected_fields():
     assert "scenario_name" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+    assert "housing_commitment" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+    assert "auto_loan_commitment" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+    assert "personal_loan_commitment" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+    assert "credit_card_commitment" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+    assert "other_credit_commitments" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+    assert "existing_monthly_commitments" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
     assert "simulated_euribor_percentage" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
     assert "simulated_spread_percentage" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
     assert "stress_buffer_percentage" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
     assert "scenario_note" in REQUIRED_SAMPLE_SCENARIO_COLUMNS
+
+
+def test_structured_commitment_columns_contains_expected_fields():
+    assert STRUCTURED_COMMITMENT_COLUMNS == {
+        "housing_commitment",
+        "auto_loan_commitment",
+        "personal_loan_commitment",
+        "credit_card_commitment",
+        "other_credit_commitments",
+    }
 
 
 def test_get_default_sample_scenarios_path_points_to_examples_folder():
@@ -92,6 +115,7 @@ def test_load_sample_scenarios_from_custom_path(tmp_path):
     assert len(result) == 1
     assert result.loc[0, "scenario_name"] == "Base educational simulation"
     assert result.loc[0, "euribor_tenor"] == "6M"
+    assert result.loc[0, "existing_monthly_commitments"] == 300
 
 
 def test_load_sample_scenarios_raises_error_for_missing_file(tmp_path):
@@ -110,6 +134,7 @@ def test_validate_sample_scenarios_columns_returns_valid_result():
     assert result.missing_columns == []
     assert result.row_count == 1
     assert "required columns" in result.interpretation
+    assert "structured commitments" in result.interpretation
     assert "fictional" in result.interpretation
 
 
@@ -125,6 +150,18 @@ def test_validate_sample_scenarios_columns_detects_missing_columns():
     assert "missing required columns" in result.interpretation
 
 
+def test_validate_sample_scenarios_columns_detects_missing_commitment_column():
+    sample_dataframe = build_valid_sample_scenarios_dataframe()
+    sample_dataframe = sample_dataframe.drop(columns=["auto_loan_commitment"])
+
+    result = validate_sample_scenarios_columns(sample_dataframe)
+
+    assert result.is_valid is False
+    assert result.missing_columns == ["auto_loan_commitment"]
+    assert result.row_count == 1
+    assert "missing required columns" in result.interpretation
+
+
 def test_validate_sample_scenarios_columns_detects_empty_dataset():
     sample_dataframe = pd.DataFrame(columns=list(REQUIRED_SAMPLE_SCENARIO_COLUMNS))
 
@@ -134,6 +171,41 @@ def test_validate_sample_scenarios_columns_detects_empty_dataset():
     assert result.missing_columns == []
     assert result.row_count == 0
     assert "has no rows" in result.interpretation
+
+
+def test_validate_structured_commitments_consistency_returns_valid_result():
+    sample_dataframe = build_valid_sample_scenarios_dataframe()
+
+    result = validate_structured_commitments_consistency(sample_dataframe)
+
+    assert result.is_valid is True
+    assert result.missing_columns == []
+    assert result.row_count == 1
+    assert "Structured commitments are consistent" in result.interpretation
+
+
+def test_validate_structured_commitments_consistency_detects_inconsistent_total():
+    sample_dataframe = build_valid_sample_scenarios_dataframe()
+    sample_dataframe.loc[0, "existing_monthly_commitments"] = 999
+
+    result = validate_structured_commitments_consistency(sample_dataframe)
+
+    assert result.is_valid is False
+    assert result.missing_columns == []
+    assert result.row_count == 1
+    assert "inconsistent structured commitments totals" in result.interpretation
+
+
+def test_validate_structured_commitments_consistency_returns_column_error_first():
+    sample_dataframe = build_valid_sample_scenarios_dataframe()
+    sample_dataframe = sample_dataframe.drop(columns=["housing_commitment"])
+
+    result = validate_structured_commitments_consistency(sample_dataframe)
+
+    assert result.is_valid is False
+    assert result.missing_columns == ["housing_commitment"]
+    assert result.row_count == 1
+    assert "missing required columns" in result.interpretation
 
 
 def test_load_and_validate_sample_scenarios_from_custom_path(tmp_path):
@@ -149,3 +221,4 @@ def test_load_and_validate_sample_scenarios_from_custom_path(tmp_path):
     assert len(loaded_dataframe) == 1
     assert validation_result.is_valid is True
     assert validation_result.row_count == 1
+    assert "structured commitments" in validation_result.interpretation
