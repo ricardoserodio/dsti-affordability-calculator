@@ -12,6 +12,7 @@ The **DSTI Affordability Calculator** is a banking-inspired financial affordabil
 
 - Debt Service-to-Income analysis;
 - repayment capacity simulation;
+- structured commitments analysis;
 - interest rate stress testing;
 - simulated EURIBOR and spread assumptions;
 - Loan-to-Value awareness;
@@ -52,6 +53,7 @@ This project demonstrates a full banking-inspired affordability simulation workf
 ```text
 Financial calculations
 DSTI analysis
+Structured commitments analysis
 Loan payment estimation
 Interest rate stress testing
 Simulated EURIBOR + spread assumptions
@@ -85,7 +87,11 @@ Reporting Analyst - Banking
 The calculator allows users to simulate fictional affordability scenarios using inputs such as:
 
 - monthly net income;
-- existing monthly credit commitments;
+- existing housing credit commitment;
+- existing auto loan commitment;
+- existing personal loan commitment;
+- existing credit card commitment;
+- other existing credit commitments;
 - simulated loan amount;
 - simulated maturity;
 - simulated EURIBOR assumption;
@@ -99,6 +105,8 @@ The calculator allows users to simulate fictional affordability scenarios using 
 
 The app then calculates and explains:
 
+- total existing monthly commitments;
+- highest commitment category;
 - base DSTI;
 - stressed DSTI;
 - estimated base monthly instalment;
@@ -147,6 +155,44 @@ It includes both:
 Base DSTI
 Stressed DSTI
 ```
+
+---
+
+### Structured Commitments Analysis
+
+The project includes a structured commitments analysis layer that separates existing monthly commitments into educational categories:
+
+```text
+Housing commitment
+Auto loan commitment
+Personal loan commitment
+Credit card commitment
+Other credit commitments
+```
+
+The module calculates:
+
+```text
+Total existing monthly commitments
+Highest commitment category
+Commitment-level interpretation
+```
+
+This improves the DSTI simulation by making input assumptions more transparent, traceable and explainable.
+
+Instead of relying only on one generic commitments input, the app can now show how different types of existing commitments contribute to the total monthly debt service used in the DSTI calculation.
+
+This feature supports:
+
+```text
+Financial data quality
+Input validation
+Affordability risk awareness
+Scenario analysis
+Human-in-the-loop review
+```
+
+All values remain fictional, simulated or anonymised.
 
 ---
 
@@ -281,6 +327,7 @@ Incoherent stressed scenarios
 Extreme DSTI outputs
 Missing sample scenario columns
 Invalid EURIBOR tenors
+Inconsistent structured commitments totals
 ```
 
 Validation is a central part of the project.
@@ -308,6 +355,9 @@ Longer maturity simulation
 Older borrower simulation
 Negative EURIBOR simulation
 Zero stress buffer simulation
+High housing commitment simulation
+Credit card commitment simulation
+No existing commitments simulation
 ```
 
 The dataset is validated through automated tests.
@@ -321,6 +371,7 @@ The project includes unit tests for:
 ```text
 DSTI calculator
 Income calculator
+Commitments analyzer
 Loan payment calculator
 Interest rate builder
 Interest rate stress testing
@@ -356,6 +407,7 @@ examples/
 
 src/
 ├── __init__.py
+├── commitments_analyzer.py
 ├── dsti_calculator.py
 ├── euribor_provider.py
 ├── income_calculator.py
@@ -370,6 +422,7 @@ src/
 
 tests/
 ├── test_app_imports.py
+├── test_commitments_analyzer.py
 ├── test_dsti_calculator.py
 ├── test_euribor_provider.py
 ├── test_income_calculator.py
@@ -401,6 +454,7 @@ loan_payment_formula_explained.md
 interest_rate_builder_explained.md
 interest_rate_stress_explained.md
 euribor_assumptions_policy.md
+commitments_analysis_explained.md
 scenario_analysis.md
 sample_scenarios_explained.md
 ui_mockup.md
@@ -473,7 +527,16 @@ Example fictional inputs:
 
 ```text
 Monthly net income: €2,500
-Existing monthly commitments: €300
+
+Existing commitments:
+Housing commitment: €0
+Auto loan commitment: €150
+Personal loan commitment: €100
+Credit card commitment: €50
+Other credit commitments: €0
+
+Total existing commitments: €300
+
 Loan amount: €180,000
 Maturity: 30 years
 Simulated EURIBOR: 3.00%
@@ -506,6 +569,29 @@ Margin against stressed instalment
 ```
 
 All outputs are educational and indicative only.
+
+---
+
+## Data Quality and Explainability Workflow
+
+The project follows a transparent workflow:
+
+```text
+1. User enters fictional or anonymised income assumptions.
+2. User enters existing commitments by category.
+3. Commitments analyzer calculates total existing commitments.
+4. User enters loan, maturity and interest rate assumptions.
+5. Interest rate builder calculates base and stressed annual rates.
+6. Loan payment calculator estimates base and stressed instalments.
+7. DSTI calculator estimates base and stressed DSTI.
+8. LTV and maturity modules provide additional risk awareness.
+9. Validation checks identify missing, inconsistent or unusual inputs.
+10. The app displays explanations, warnings and scenario comparisons.
+```
+
+This workflow is designed to support analysis and judgement.
+
+It does not replace judgement.
 
 ---
 
@@ -604,6 +690,10 @@ Legal documentation
 Regulatory requirements
 Bank-specific credit policy
 Formal affordability rules
+Credit card limits
+Credit card utilisation
+Revolving balances
+Behavioural risk
 ```
 
 ---
@@ -630,6 +720,7 @@ This project demonstrates practical skills in:
 Financial analysis
 Banking-inspired affordability logic
 Credit risk awareness
+Structured commitments analysis
 Financial data validation
 Scenario analysis
 Python programming
@@ -643,13 +734,19 @@ Responsible AI and human-in-the-loop thinking
 Suggested CV description:
 
 ```text
-Built a banking-inspired DSTI affordability simulation tool using Python and Streamlit, including loan payment estimation, interest rate stress testing, simulated EURIBOR and spread assumptions, LTV and maturity checks, fictional scenario validation, automated unit tests and explainable documentation focused on financial literacy, data quality and risk awareness.
+Built a banking-inspired DSTI affordability simulation tool using Python and Streamlit, including structured commitments analysis, loan payment estimation, interest rate stress testing, simulated EURIBOR and spread assumptions, LTV and maturity checks, fictional scenario validation, automated unit tests and explainable documentation focused on financial literacy, data quality and risk awareness.
 ```
 
 Short CV version:
 
 ```text
-Developed a Python/Streamlit DSTI affordability calculator with interest rate stress testing, LTV/maturity checks, data validation, sample scenario testing and automated GitHub Actions.
+Developed a Python/Streamlit DSTI affordability calculator with structured commitments analysis, interest rate stress testing, LTV/maturity checks, data validation, sample scenario testing and automated GitHub Actions.
+```
+
+Additional CV bullet:
+
+```text
+Enhanced the calculator with a structured commitments analysis layer, separating housing, auto loan, personal loan, credit card and other monthly commitments to improve financial data quality, explainability and affordability risk awareness.
 ```
 
 ---
