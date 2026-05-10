@@ -2,8 +2,8 @@
 Streamlit application for the DSTI Affordability Calculator.
 
 This app provides a clean, educational and banking-inspired interface for
-simulating financial affordability, DSTI, LTV, maturity and interest rate
-stress scenarios.
+simulating financial affordability, DSTI, LTV, maturity, existing commitments
+and interest rate stress scenarios.
 
 The application is for educational, demonstrative and portfolio purposes only.
 It does not approve or reject credit, provide financial advice or replace
@@ -24,6 +24,7 @@ SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.append(str(SRC_PATH))
 
+from commitments_analyzer import analyse_existing_commitments
 from euribor_provider import build_manual_euribor_reference
 from interest_rate_builder import build_interest_rate_assumptions
 from interest_rate_stress import run_interest_rate_stress_test
@@ -72,7 +73,7 @@ def render_header() -> None:
             <p>
                 Banking-inspired financial affordability and DSTI simulation tool
                 focused on financial literacy, data validation, explainability,
-                interest rate sensitivity and risk awareness.
+                interest rate sensitivity, commitments analysis and risk awareness.
             </p>
         </div>
         """,
@@ -324,6 +325,60 @@ with st.sidebar:
 
     st.divider()
 
+    st.subheader("Existing Monthly Commitments")
+
+    housing_commitment = st.number_input(
+        "Existing housing credit commitment (€)",
+        min_value=0.0,
+        value=0.0,
+        step=25.0,
+    )
+
+    auto_loan_commitment = st.number_input(
+        "Auto loan commitment (€)",
+        min_value=0.0,
+        value=150.0,
+        step=25.0,
+    )
+
+    personal_loan_commitment = st.number_input(
+        "Personal loan commitment (€)",
+        min_value=0.0,
+        value=100.0,
+        step=25.0,
+    )
+
+    credit_card_commitment = st.number_input(
+        "Credit card commitment (€)",
+        min_value=0.0,
+        value=50.0,
+        step=25.0,
+    )
+
+    other_credit_commitments = st.number_input(
+        "Other credit commitments (€)",
+        min_value=0.0,
+        value=0.0,
+        step=25.0,
+    )
+
+    commitments_result = analyse_existing_commitments(
+        housing_commitment=housing_commitment,
+        auto_loan_commitment=auto_loan_commitment,
+        personal_loan_commitment=personal_loan_commitment,
+        credit_card_commitment=credit_card_commitment,
+        other_credit_commitments=other_credit_commitments,
+    )
+
+    existing_monthly_commitments = commitments_result.total_existing_commitments
+
+    st.info(
+        f"Total existing monthly commitments: "
+        f"{format_currency(existing_monthly_commitments)}"
+    )
+
+    st.divider()
+
     st.subheader("Loan and Interest Rate Assumptions")
 
     loan_amount = st.number_input(
@@ -384,14 +439,7 @@ with st.sidebar:
 
     st.divider()
 
-    st.subheader("Credit Commitments")
-
-    existing_monthly_commitments = st.number_input(
-        "Existing monthly credit commitments (€)",
-        min_value=0.0,
-        value=300.0,
-        step=25.0,
-    )
+    st.subheader("DSTI Configuration")
 
     configured_dsti_threshold_percentage = st.slider(
         "Configured DSTI threshold for simulation (%)",
@@ -595,10 +643,75 @@ else:
 
     with col4:
         render_metric_card(
-            "Remaining Capacity",
-            format_currency(scenario.dsti.remaining_repayment_capacity),
-            "Indicative margin before the configured DSTI threshold.",
+            "Existing Commitments",
+            format_currency(commitments_result.total_existing_commitments),
+            "Structured total of existing monthly credit commitments.",
         )
+
+    render_section_title(
+        "Existing Commitments Analysis",
+        "Breakdown of existing monthly commitments used in the DSTI calculation.",
+    )
+
+    commitments_table = pd.DataFrame(
+        [
+            {
+                "Category": "Housing commitment",
+                "Monthly value": format_currency(
+                    commitments_result.housing_commitment
+                ),
+            },
+            {
+                "Category": "Auto loan commitment",
+                "Monthly value": format_currency(
+                    commitments_result.auto_loan_commitment
+                ),
+            },
+            {
+                "Category": "Personal loan commitment",
+                "Monthly value": format_currency(
+                    commitments_result.personal_loan_commitment
+                ),
+            },
+            {
+                "Category": "Credit card commitment",
+                "Monthly value": format_currency(
+                    commitments_result.credit_card_commitment
+                ),
+            },
+            {
+                "Category": "Other credit commitments",
+                "Monthly value": format_currency(
+                    commitments_result.other_credit_commitments
+                ),
+            },
+            {
+                "Category": "Total existing commitments",
+                "Monthly value": format_currency(
+                    commitments_result.total_existing_commitments
+                ),
+            },
+            {
+                "Category": "Highest category",
+                "Monthly value": commitments_result.highest_commitment_category,
+            },
+        ]
+    )
+
+    st.dataframe(
+        commitments_table,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.markdown(
+        f"""
+        <div class="info-card">
+            {commitments_result.interpretation}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if (
         euribor_reference is not None
@@ -893,6 +1006,11 @@ else:
             "credit policy."
         )
         st.write(
+            "Existing commitments are manually entered by category for "
+            "educational data quality and explainability purposes only. They "
+            "are not verified against real credit documentation."
+        )
+        st.write(
             "EURIBOR, spread and stress buffer values are manually entered "
             "simulation assumptions. They are not live market data, bank pricing, "
             "loan offers or financial advice."
@@ -908,9 +1026,9 @@ st.markdown(
     <div class="footer-note">
         This project is educational and demonstrative. It does not use real client
         data, does not process personal documents, does not perform OCR and does
-        not represent any bank's internal credit policy. EURIBOR, spread and stress
-        values are simulated assumptions only. All values should be fictional,
-        simulated or anonymised.
+        not represent any bank's internal credit policy. Existing commitments,
+        EURIBOR, spread and stress values are simulated assumptions only. All
+        values should be fictional, simulated or anonymised.
     </div>
     """,
     unsafe_allow_html=True,
