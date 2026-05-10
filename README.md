@@ -1,44 +1,115 @@
 # DSTI Affordability Calculator
 
-**Banking-inspired financial affordability and DSTI simulation tool focused on financial literacy, data validation, explainability and risk awareness.**
-
----
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
+![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
+![Status](https://img.shields.io/badge/Status-Portfolio%20Project-lightgrey)
+![Purpose](https://img.shields.io/badge/Purpose-Educational%20Simulation-informational)
 
 ## Project Overview
 
-The **DSTI Affordability Calculator** is an educational and portfolio-oriented financial simulation tool designed to help users understand how debt service, income, existing credit commitments and stress scenarios may affect financial affordability.
+The **DSTI Affordability Calculator** is a banking-inspired financial affordability simulation tool focused on:
 
-The project focuses on the concept of **DSTI — Debt Service-to-Income**, commonly used in banking and credit analysis to assess the relationship between monthly debt obligations and monthly income.
+- Debt Service-to-Income analysis;
+- repayment capacity simulation;
+- interest rate stress testing;
+- simulated EURIBOR and spread assumptions;
+- Loan-to-Value awareness;
+- maturity and age-at-end-of-loan awareness;
+- financial data validation;
+- explainability;
+- responsible financial simulation;
+- human-in-the-loop interpretation.
 
-This tool is inspired by banking workflows, but it is not a credit approval system, underwriting engine, financial advisory tool or substitute for formal human credit analysis.
+The project is designed as a professional portfolio project for financial data analysis, banking analytics, credit risk awareness, data quality validation and AI finance evaluation.
 
----
-
-## Main Objectives
-
-The main objectives of this project are to:
-
-- calculate indicative DSTI ratios;
-- simulate financial effort under different scenarios;
-- compare current and potential future instalments;
-- consider existing credit commitments;
-- apply simple interest rate stress scenarios;
-- validate financial inputs before calculation;
-- identify potential affordability risk factors;
-- explain assumptions and limitations clearly;
-- promote financial literacy and responsible simulation use.
+It is not a credit approval system, lending decision engine, underwriting model, bank pricing tool or financial advisory application.
 
 ---
 
-## What This Project Is
+## Live Demo
 
-This project is:
+Streamlit app:
 
-- an educational financial affordability simulator;
-- a DSTI calculation and explanation tool;
-- a portfolio project for banking analytics and financial data quality;
-- a demonstrative tool inspired by banking workflows;
-- a practical example of explainable financial logic using Python.
+```text
+Coming soon
+```
+
+---
+
+## Screenshot
+
+```text
+Screenshot coming soon after deployment.
+```
+
+---
+
+## Professional Positioning
+
+This project demonstrates a full banking-inspired affordability simulation workflow:
+
+```text
+Financial calculations
+DSTI analysis
+Loan payment estimation
+Interest rate stress testing
+Simulated EURIBOR + spread assumptions
+LTV checks
+Maturity checks
+Scenario analysis
+Sample scenario validation
+Financial data quality controls
+Automated unit tests
+Explainable documentation
+Responsible use disclaimers
+```
+
+It is especially relevant for roles such as:
+
+```text
+Banking Analytics
+Financial Data Quality Analyst
+Data Validation Analyst
+Credit Risk Analyst
+Financial Analyst
+AI Finance Evaluation
+Fintech Product Analyst
+Reporting Analyst - Banking
+```
+
+---
+
+## What This Project Does
+
+The calculator allows users to simulate fictional affordability scenarios using inputs such as:
+
+- monthly net income;
+- existing monthly credit commitments;
+- simulated loan amount;
+- simulated maturity;
+- simulated EURIBOR assumption;
+- simulated spread assumption;
+- interest rate stress buffer;
+- property acquisition value;
+- property valuation value;
+- configured DSTI threshold;
+- configured LTV threshold;
+- fictional or anonymised current age.
+
+The app then calculates and explains:
+
+- base DSTI;
+- stressed DSTI;
+- estimated base monthly instalment;
+- estimated stressed monthly instalment;
+- monthly payment increase;
+- remaining repayment capacity;
+- margin against stressed instalment;
+- LTV;
+- age at end of loan;
+- validation warnings;
+- scenario comparison.
 
 ---
 
@@ -46,315 +117,548 @@ This project is:
 
 This project is not:
 
-- a credit approval engine;
-- an automatic lending decision system;
+- a credit approval tool;
+- a credit rejection tool;
+- a lending decision engine;
+- an underwriting system;
+- a bank pricing model;
+- a real-time EURIBOR data platform;
 - a financial advisory tool;
-- a commercial underwriting model;
-- a replacement for human credit analysis;
-- a representation of any bank's internal credit policy;
-- a guarantee of eligibility, approval or affordability.
+- a replacement for formal human credit analysis;
+- a representation of any bank's internal credit policy.
+
+The outputs are educational and indicative only.
 
 ---
 
 ## Key Features
 
-Planned and/or implemented features include:
+### DSTI Calculation
 
-- monthly net income analysis;
-- existing credit commitments input;
-- proposed instalment simulation;
-- DSTI calculation;
-- stressed DSTI calculation;
-- comparison between current and future financial effort;
-- maturity and age-related scenario checks;
-- LTV simulation;
-- configurable assumptions;
-- input validation;
-- risk warning messages;
-- explanatory outputs;
-- Streamlit interface;
-- sample fictional scenarios.
+The project calculates Debt Service-to-Income using:
+
+```text
+DSTI = (Existing Monthly Commitments + Monthly Instalment) / Monthly Net Income × 100
+```
+
+It includes both:
+
+```text
+Base DSTI
+Stressed DSTI
+```
 
 ---
 
-## DSTI Formula
+### Loan Payment Calculation
 
-The simplified DSTI formula used in this project is:
+The project estimates monthly loan payments using a simplified amortising loan formula.
 
-```text
-DSTI = Total Monthly Debt Payments / Monthly Net Income
-```
-
-Where:
+Inputs include:
 
 ```text
-Total Monthly Debt Payments =
-Existing Monthly Credit Commitments + Proposed Monthly Instalment
+Loan amount
+Annual interest rate assumption
+Loan maturity
 ```
 
-The result is usually expressed as a percentage:
-
-```text
-DSTI (%) = (Total Monthly Debt Payments / Monthly Net Income) × 100
-```
-
-A stressed version may also be calculated by replacing the proposed instalment with a stressed or aggravated instalment.
+The result is used to support DSTI and interest rate sensitivity analysis.
 
 ---
 
-## Example Interpretation
+### Interest Rate Builder
 
-For example, if a fictional household has:
+The project separates interest rate assumptions into:
+
+```text
+Simulated EURIBOR
+Simulated spread
+Stress buffer
+```
+
+Formula:
+
+```text
+Base Annual Interest Rate =
+Simulated EURIBOR + Simulated Spread
+```
+
+Formula:
+
+```text
+Stressed Annual Interest Rate =
+Base Annual Interest Rate + Stress Buffer
+```
+
+This makes the simulation more realistic and explainable while remaining educational.
+
+---
+
+### Manual EURIBOR Reference Handling
+
+The project includes a manual EURIBOR reference provider.
+
+It supports:
+
+```text
+EURIBOR tenor selection
+Manual EURIBOR assumption
+Source label
+Optional reference date
+Data quality interpretation
+```
+
+The EURIBOR value is not live market data.
+
+It is a manual simulated assumption used for educational scenario analysis.
+
+---
+
+### Interest Rate Stress Testing
+
+The calculator estimates the impact of a higher stressed interest rate on:
+
+```text
+Estimated monthly instalment
+Monthly payment increase
+Monthly payment increase percentage
+Total repayment increase
+Stressed DSTI
+```
+
+This supports risk awareness and affordability sensitivity analysis.
+
+---
+
+### LTV Awareness
+
+The project calculates a simplified Loan-to-Value indicator:
+
+```text
+LTV = Loan Amount / Property Value × 100
+```
+
+The app can use either:
+
+```text
+Acquisition value
+Valuation value
+Lower of acquisition and valuation value
+```
+
+This is for educational risk awareness only.
+
+---
+
+### Maturity Awareness
+
+The project estimates:
+
+```text
+Age at end of loan = Current age + Loan maturity
+```
+
+This helps demonstrate maturity-related risk awareness.
+
+It must not be interpreted as a real bank policy rule.
+
+---
+
+### Financial Data Validation
+
+The project includes validation checks for:
+
+```text
+Missing values
+Negative values
+Zero income
+Unrealistic income assumptions
+Unrealistic commitment assumptions
+Invalid percentages
+Invalid LTV inputs
+Invalid maturity inputs
+Incoherent stressed scenarios
+Extreme DSTI outputs
+Missing sample scenario columns
+Invalid EURIBOR tenors
+```
+
+Validation is a central part of the project.
+
+---
+
+### Sample Scenario Dataset
+
+The repository includes fictional sample scenarios in:
+
+```text
+examples/sample_scenarios.csv
+```
+
+These scenarios demonstrate:
+
+```text
+Base affordability simulation
+Prudent income simulation
+Higher commitments simulation
+Higher interest stress simulation
+Lower income simulation
+Higher LTV simulation
+Longer maturity simulation
+Older borrower simulation
+Negative EURIBOR simulation
+Zero stress buffer simulation
+```
+
+The dataset is validated through automated tests.
+
+---
+
+### Automated Tests
+
+The project includes unit tests for:
+
+```text
+DSTI calculator
+Income calculator
+Loan payment calculator
+Interest rate builder
+Interest rate stress testing
+EURIBOR provider
+LTV calculator
+Maturity validator
+Scenario engine
+Validation checks
+Sample scenario loader
+Actual sample scenarios CSV
+Application import smoke tests
+```
+
+Tests run automatically through GitHub Actions.
+
+---
+
+## Project Structure
+
+```text
+.github/
+└── workflows/
+    └── python-tests.yml
+
+.streamlit/
+└── config.toml
+
+app/
+└── streamlit_app.py
+
+examples/
+└── sample_scenarios.csv
+
+src/
+├── __init__.py
+├── dsti_calculator.py
+├── euribor_provider.py
+├── income_calculator.py
+├── interest_rate_builder.py
+├── interest_rate_stress.py
+├── loan_payment_calculator.py
+├── ltv_calculator.py
+├── maturity_validator.py
+├── sample_scenario_loader.py
+├── scenario_engine.py
+└── validation_checks.py
+
+tests/
+├── test_app_imports.py
+├── test_dsti_calculator.py
+├── test_euribor_provider.py
+├── test_income_calculator.py
+├── test_interest_rate_builder.py
+├── test_interest_rate_stress.py
+├── test_loan_payment_calculator.py
+├── test_ltv_calculator.py
+├── test_maturity_validator.py
+├── test_sample_scenario_loader.py
+├── test_sample_scenarios_csv.py
+├── test_scenario_engine.py
+└── test_validation_checks.py
+```
+
+---
+
+## Documentation
+
+The repository includes documentation for:
+
+```text
+README.md
+disclaimer.md
+methodology.md
+financial_assumptions.md
+data_validation_rules.md
+dsti_formula_explained.md
+loan_payment_formula_explained.md
+interest_rate_builder_explained.md
+interest_rate_stress_explained.md
+euribor_assumptions_policy.md
+scenario_analysis.md
+sample_scenarios_explained.md
+ui_mockup.md
+usage_guide.md
+deployment_guide.md
+```
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ricardoserodio/dsti-affordability-calculator.git
+cd dsti-affordability-calculator
+```
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+On Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+On macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Running the App
+
+Run the Streamlit app:
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+---
+
+## Running Tests
+
+Run all tests:
+
+```bash
+pytest tests/
+```
+
+The project also uses GitHub Actions to run tests automatically on push and pull request.
+
+---
+
+## Example Simulation Logic
+
+Example fictional inputs:
 
 ```text
 Monthly net income: €2,500
-Existing monthly credit commitments: €300
-Proposed new instalment: €650
+Existing monthly commitments: €300
+Loan amount: €180,000
+Maturity: 30 years
+Simulated EURIBOR: 3.00%
+Simulated spread: 0.90%
+Stress buffer: 1.50%
+Configured DSTI threshold: 40%
 ```
 
-Then:
+Base annual interest rate:
 
 ```text
-DSTI = (300 + 650) / 2,500
-DSTI = 950 / 2,500
-DSTI = 38%
+3.00% + 0.90% = 3.90%
 ```
 
-This means that, in this simulated scenario, 38% of monthly net income would be allocated to debt payments.
+Stressed annual interest rate:
 
-This result is only indicative and must not be interpreted as approval, rejection or financial advice.
+```text
+3.90% + 1.50% = 5.40%
+```
 
----
+The app then estimates:
 
-## Financial Data Quality Focus
+```text
+Base monthly instalment
+Stressed monthly instalment
+Base DSTI
+Stressed DSTI
+Remaining repayment capacity
+Margin against stressed instalment
+```
 
-Financial data quality is a central part of this project.
-
-The tool should validate inputs such as:
-
-- missing values;
-- negative values;
-- unrealistic income levels;
-- unrealistic expenses;
-- invalid percentages;
-- inconsistent maturities;
-- incoherent credit scenarios;
-- incomplete assumptions;
-- extreme or unusual DSTI values.
-
-The purpose is to demonstrate how financial simulations should include basic validation checks before producing outputs.
+All outputs are educational and indicative only.
 
 ---
 
-## Risk Awareness
+## Responsible Use
 
-The application should help users understand that affordability can be affected by several factors, including:
+This project should only be used for:
 
-- lower income;
-- higher existing debt commitments;
-- higher interest rates;
-- longer or shorter maturity assumptions;
-- stressed instalment scenarios;
-- unrealistic input assumptions;
-- incomplete financial information.
+```text
+Educational demonstration
+Portfolio presentation
+Financial literacy
+Scenario analysis
+Data validation practice
+Banking analytics learning
+AI finance evaluation practice
+```
 
-The tool should explain why a scenario may present higher risk, without making a formal lending decision.
+It should not be used for:
+
+```text
+Real client credit analysis
+Credit approval
+Credit rejection
+Eligibility assessment
+Bank pricing
+Financial advice
+Personal financial recommendations
+Regulatory decision-making
+```
+
+---
+
+## Privacy and Data Protection
+
+The project does not require real personal data.
+
+Users should not enter:
+
+```text
+Real names
+Real tax numbers
+Real bank account information
+Real client identifiers
+Real salaries
+Real loan contracts
+Real credit responsibility maps
+Personal documents
+Confidential bank information
+Internal policy rules
+```
+
+All values should be fictional, simulated or anonymised.
 
 ---
 
 ## Human-in-the-Loop Principle
 
-This project follows a **human-in-the-loop** approach.
+The calculator is designed to support human interpretation.
 
-The calculator provides structured, explainable and educational outputs, but interpretation should remain cautious and contextual.
+A human reviewer should consider:
 
-The tool does not automatically approve or reject any credit scenario.
+```text
+Whether assumptions are coherent
+Whether values are realistic
+Whether outputs are unusually high or low
+Whether warnings require review
+Whether limitations are clearly understood
+Whether the result is being interpreted responsibly
+```
+
+The tool supports judgement.
+
+It does not replace judgement.
 
 ---
 
-## Privacy and Data Protection Notice
+## Limitations
 
-This project does not request, store, process or analyse real personal documents.
+The project uses simplified educational assumptions.
 
-References to documents such as payslips, tax statements, credit responsibility maps or loan simulations are included solely for educational purposes, to explain the types of information commonly considered in affordability assessments.
+It does not model:
 
-Users should only input fictional, simulated or anonymised values.
-
-This tool does not perform document verification, OCR, client onboarding, credit approval or formal banking validation.
-
----
-
-## Supporting Documents — Educational Context Only
-
-The application may reference common supporting documents typically used in banking affordability and credit viability analysis, such as:
-
-- payslips or salary statements;
-- annual tax returns;
-- tax assessment statements;
-- credit responsibility maps;
-- proof of existing financial commitments;
-- housing expense information;
-- loan simulations;
-- proof of additional income sources.
-
-These references are purely educational and demonstrative.
-
-The application must never request real documents, store sensitive personal information, process real client data or replace formal banking verification processes.
+```text
+APR/APRC
+Bank fees
+Insurance costs
+Tax effects
+Fixed-rate periods
+Mixed-rate periods
+Variable reset dates
+Promotional campaigns
+Bonified spreads
+Employment stability
+Credit history
+Legal documentation
+Regulatory requirements
+Bank-specific credit policy
+Formal affordability rules
+```
 
 ---
 
 ## Technology Stack
 
-Planned technology stack:
-
-- Python;
-- Streamlit;
-- pandas;
-- NumPy;
-- matplotlib;
-- validation logic;
-- optional Power BI integration.
-
----
-
-## Proposed Project Structure
-
 ```text
-dsti-affordability-calculator/
-│
-├── README.md
-├── disclaimer.md
-├── methodology.md
-├── dsti_formula_explained.md
-├── financial_assumptions.md
-├── data_validation_rules.md
-├── scenario_analysis.md
-├── requirements.txt
-│
-├── src/
-│   ├── __init__.py
-│   ├── dsti_calculator.py
-│   ├── income_calculator.py
-│   ├── ltv_calculator.py
-│   ├── maturity_validator.py
-│   ├── validation_checks.py
-│   └── scenario_engine.py
-│
-├── app/
-│   └── streamlit_app.py
-│
-├── examples/
-│   └── sample_scenarios.csv
-│
-└── tests/
-    └── test_dsti_calculator.py
+Python
+Streamlit
+pandas
+NumPy
+matplotlib
+pytest
+GitHub Actions
 ```
 
 ---
 
-## Planned Modules
+## Portfolio Value
 
-### `dsti_calculator.py`
+This project demonstrates practical skills in:
 
-Responsible for calculating:
+```text
+Financial analysis
+Banking-inspired affordability logic
+Credit risk awareness
+Financial data validation
+Scenario analysis
+Python programming
+Streamlit dashboard development
+Unit testing
+GitHub Actions
+Technical documentation
+Responsible AI and human-in-the-loop thinking
+```
 
-- base DSTI;
-- stressed DSTI;
-- available repayment capacity;
-- difference between configured threshold and simulated DSTI.
+Suggested CV description:
 
-### `income_calculator.py`
+```text
+Built a banking-inspired DSTI affordability simulation tool using Python and Streamlit, including loan payment estimation, interest rate stress testing, simulated EURIBOR and spread assumptions, LTV and maturity checks, fictional scenario validation, automated unit tests and explainable documentation focused on financial literacy, data quality and risk awareness.
+```
 
-Responsible for handling:
+Short CV version:
 
-- monthly net income;
-- aggregated household income;
-- conservative income assumptions;
-- fictional income examples.
-
-### `ltv_calculator.py`
-
-Responsible for calculating:
-
-- indicative loan-to-value;
-- acquisition value versus valuation value;
-- configured LTV assumptions.
-
-### `maturity_validator.py`
-
-Responsible for checking:
-
-- loan maturity;
-- age at the end of the simulated contract;
-- inconsistent maturity assumptions.
-
-### `validation_checks.py`
-
-Responsible for validating:
-
-- missing values;
-- negative inputs;
-- unrealistic values;
-- invalid percentages;
-- incoherent scenarios.
-
-### `scenario_engine.py`
-
-Responsible for generating:
-
-- base scenario;
-- prudent scenario;
-- stressed interest rate scenario;
-- comparative affordability outputs.
-
----
-
-## Disclaimer
-
-This project is for educational, demonstrative and portfolio purposes only.
-
-It does not provide financial advice, credit advice, lending recommendations or eligibility assessments.
-
-The calculations, assumptions and outputs are simplified and should not be interpreted as a formal credit decision.
-
-No real client data, confidential banking information or proprietary credit policy rules are used in this project.
-
-All examples are fictional, simulated or anonymised.
-
----
-
-## Professional Context
-
-This project was created as part of a professional portfolio focused on:
-
-- banking analytics;
-- financial data quality;
-- credit risk awareness;
-- financial literacy;
-- explainable financial simulations;
-- responsible use of financial technology;
-- Python applied to finance.
-
----
-
-## Future Improvements
-
-Possible future improvements include:
-
-- Streamlit dashboard;
-- visual DSTI breakdown;
-- scenario comparison charts;
-- configurable stress assumptions;
-- sample fictional datasets;
-- automated validation reports;
-- exportable simulation summary;
-- Power BI dashboard integration;
-- unit tests for calculation logic.
+```text
+Developed a Python/Streamlit DSTI affordability calculator with interest rate stress testing, LTV/maturity checks, data validation, sample scenario testing and automated GitHub Actions.
+```
 
 ---
 
 ## Author
 
-Created by **Ricardo Serôdio** as part of the **Wisestrike Finance Lab** portfolio.
+**Ricardo Serôdio**  
+Wisestrike Finance Lab
 
-This project reflects professional interests in banking, financial analysis, credit processes, data validation, financial literacy and responsible financial simulations.
+Professional background in banking, wealth management, retail banking operations, credit processes, AML/CFT, KYC/CDD and MiFID II.
+
+This project is part of a professional portfolio focused on banking analytics, financial data quality, AI finance evaluation, fintech and responsible financial simulation.
