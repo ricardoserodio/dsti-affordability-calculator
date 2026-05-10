@@ -24,6 +24,7 @@ SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.append(str(SRC_PATH))
 
+from euribor_provider import build_manual_euribor_reference
 from interest_rate_builder import build_interest_rate_assumptions
 from interest_rate_stress import run_interest_rate_stress_test
 from scenario_engine import compare_scenarios, run_affordability_scenario
@@ -339,10 +340,27 @@ with st.sidebar:
         step=1.0,
     )
 
+    euribor_tenor = st.selectbox(
+        "Simulated EURIBOR tenor",
+        options=["1M", "3M", "6M", "12M"],
+        index=2,
+    )
+
     simulated_euribor_percentage = st.number_input(
         "Simulated EURIBOR assumption (%)",
         value=3.00,
         step=0.05,
+    )
+
+    euribor_source_label = st.text_input(
+        "EURIBOR source label",
+        value="Manual simulated input",
+    )
+
+    euribor_reference_date = st.text_input(
+        "EURIBOR reference date",
+        value="",
+        placeholder="Example: 2026-01-01",
     )
 
     simulated_spread_percentage = st.number_input(
@@ -384,8 +402,15 @@ with st.sidebar:
     )
 
     if use_calculated_instalments:
+        euribor_reference = build_manual_euribor_reference(
+            tenor=euribor_tenor,
+            euribor_percentage=simulated_euribor_percentage,
+            source_label=euribor_source_label,
+            reference_date=euribor_reference_date,
+        )
+
         interest_rate_build = build_interest_rate_assumptions(
-            simulated_euribor_percentage=simulated_euribor_percentage,
+            simulated_euribor_percentage=euribor_reference.euribor_percentage,
             simulated_spread_percentage=simulated_spread_percentage,
             stress_buffer_percentage=stress_buffer_percentage,
         )
@@ -419,6 +444,7 @@ with st.sidebar:
         )
 
     else:
+        euribor_reference = None
         interest_rate_build = None
         interest_rate_stress = None
 
@@ -574,7 +600,11 @@ else:
             "Indicative margin before the configured DSTI threshold.",
         )
 
-    if interest_rate_build is not None and interest_rate_stress is not None:
+    if (
+        euribor_reference is not None
+        and interest_rate_build is not None
+        and interest_rate_stress is not None
+    ):
         render_section_title(
             "Interest Rate Assumptions",
             "Simulated EURIBOR, spread and stress buffer used to estimate instalments.",
@@ -584,8 +614,8 @@ else:
 
         with rate_col1:
             render_metric_card(
-                "Simulated EURIBOR",
-                format_percentage(interest_rate_build.simulated_euribor_percentage),
+                f"Simulated EURIBOR {euribor_reference.tenor}",
+                format_percentage(euribor_reference.euribor_percentage),
                 "Manual educational EURIBOR assumption.",
             )
 
@@ -617,9 +647,21 @@ else:
         interest_rate_table = pd.DataFrame(
             [
                 {
+                    "Metric": "EURIBOR tenor",
+                    "Value": euribor_reference.tenor,
+                },
+                {
+                    "Metric": "EURIBOR source label",
+                    "Value": euribor_reference.source_label,
+                },
+                {
+                    "Metric": "EURIBOR reference date",
+                    "Value": euribor_reference.reference_date or "Not provided",
+                },
+                {
                     "Metric": "Simulated EURIBOR",
                     "Value": format_percentage(
-                        interest_rate_build.simulated_euribor_percentage
+                        euribor_reference.euribor_percentage
                     ),
                 },
                 {
@@ -688,6 +730,8 @@ else:
         st.markdown(
             f"""
             <div class="info-card">
+                {euribor_reference.interpretation}
+                <br><br>
                 {interest_rate_build.interpretation}
                 <br><br>
                 {interest_rate_stress.interpretation}
