@@ -2,7 +2,8 @@
 Streamlit application for the DSTI Affordability Calculator.
 
 This app provides a clean, educational and banking-inspired interface for
-simulating financial affordability, DSTI, LTV and maturity scenarios.
+simulating financial affordability, DSTI, LTV, maturity and interest rate
+stress scenarios.
 
 The application is for educational, demonstrative and portfolio purposes only.
 It does not approve or reject credit, provide financial advice or replace
@@ -23,6 +24,8 @@ SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.append(str(SRC_PATH))
 
+from interest_rate_builder import build_interest_rate_assumptions
+from interest_rate_stress import run_interest_rate_stress_test
 from scenario_engine import compare_scenarios, run_affordability_scenario
 
 
@@ -67,8 +70,8 @@ def render_header() -> None:
             <h1>DSTI Affordability Calculator</h1>
             <p>
                 Banking-inspired financial affordability and DSTI simulation tool
-                focused on financial literacy, data validation, explainability
-                and risk awareness.
+                focused on financial literacy, data validation, explainability,
+                interest rate sensitivity and risk awareness.
             </p>
         </div>
         """,
@@ -220,6 +223,17 @@ st.markdown(
             margin-bottom: 1rem;
         }
 
+        .info-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 1.2rem 1.3rem;
+            box-shadow: 0 8px 24px rgba(15, 61, 94, 0.06);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: #263442;
+        }
+
         .footer-note {
             margin-top: 2rem;
             background: #F3F6F9;
@@ -309,26 +323,55 @@ with st.sidebar:
 
     st.divider()
 
+    st.subheader("Loan and Interest Rate Assumptions")
+
+    loan_amount = st.number_input(
+        "Simulated loan amount (€)",
+        min_value=1.0,
+        value=180000.0,
+        step=1000.0,
+    )
+
+    loan_maturity_years = st.number_input(
+        "Simulated loan maturity in years",
+        min_value=1.0,
+        value=30.0,
+        step=1.0,
+    )
+
+    simulated_euribor_percentage = st.number_input(
+        "Simulated EURIBOR assumption (%)",
+        value=3.00,
+        step=0.05,
+    )
+
+    simulated_spread_percentage = st.number_input(
+        "Simulated spread assumption (%)",
+        min_value=0.0,
+        value=0.90,
+        step=0.05,
+    )
+
+    stress_buffer_percentage = st.number_input(
+        "Interest rate stress buffer (%)",
+        min_value=0.0,
+        value=1.50,
+        step=0.05,
+    )
+
+    use_calculated_instalments = st.checkbox(
+        "Estimate instalments from EURIBOR + spread",
+        value=True,
+    )
+
+    st.divider()
+
     st.subheader("Credit Commitments")
 
     existing_monthly_commitments = st.number_input(
         "Existing monthly credit commitments (€)",
         min_value=0.0,
         value=300.0,
-        step=25.0,
-    )
-
-    proposed_monthly_instalment = st.number_input(
-        "Proposed monthly instalment (€)",
-        min_value=0.0,
-        value=650.0,
-        step=25.0,
-    )
-
-    stressed_monthly_instalment = st.number_input(
-        "Stressed monthly instalment (€)",
-        min_value=0.0,
-        value=780.0,
         step=25.0,
     )
 
@@ -340,6 +383,59 @@ with st.sidebar:
         step=1.0,
     )
 
+    if use_calculated_instalments:
+        interest_rate_build = build_interest_rate_assumptions(
+            simulated_euribor_percentage=simulated_euribor_percentage,
+            simulated_spread_percentage=simulated_spread_percentage,
+            stress_buffer_percentage=stress_buffer_percentage,
+        )
+
+        interest_rate_stress = run_interest_rate_stress_test(
+            loan_amount=loan_amount,
+            maturity_years=loan_maturity_years,
+            base_annual_interest_rate_percentage=(
+                interest_rate_build.base_annual_interest_rate_percentage
+            ),
+            stressed_annual_interest_rate_percentage=(
+                interest_rate_build.stressed_annual_interest_rate_percentage
+            ),
+        )
+
+        proposed_monthly_instalment = interest_rate_stress.base_monthly_payment
+        stressed_monthly_instalment = interest_rate_stress.stressed_monthly_payment
+
+        st.info(
+            "Monthly instalments are being estimated from the simulated "
+            "EURIBOR, spread, stress buffer, loan amount and maturity."
+        )
+
+        st.write(
+            f"Base estimated instalment: "
+            f"{format_currency(proposed_monthly_instalment)}"
+        )
+        st.write(
+            f"Stressed estimated instalment: "
+            f"{format_currency(stressed_monthly_instalment)}"
+        )
+
+    else:
+        interest_rate_build = None
+        interest_rate_stress = None
+
+        proposed_monthly_instalment = st.number_input(
+            "Manual proposed monthly instalment (€)",
+            min_value=0.0,
+            value=650.0,
+            step=25.0,
+        )
+
+        stressed_monthly_instalment = st.number_input(
+            "Manual stressed monthly instalment (€)",
+            min_value=0.0,
+            value=780.0,
+            step=25.0,
+        )
+
     st.divider()
 
     st.subheader("Optional LTV Inputs")
@@ -347,13 +443,6 @@ with st.sidebar:
     include_ltv = st.checkbox("Include LTV simulation", value=True)
 
     if include_ltv:
-        loan_amount = st.number_input(
-            "Simulated loan amount (€)",
-            min_value=0.0,
-            value=180000.0,
-            step=1000.0,
-        )
-
         acquisition_value = st.number_input(
             "Simulated acquisition value (€)",
             min_value=0.0,
@@ -381,7 +470,6 @@ with st.sidebar:
             value=True,
         )
     else:
-        loan_amount = None
         acquisition_value = None
         valuation_value = None
         configured_ltv_threshold_percentage = None
@@ -401,13 +489,6 @@ with st.sidebar:
             step=1.0,
         )
 
-        loan_maturity_years = st.number_input(
-            "Simulated loan maturity in years",
-            min_value=0.0,
-            value=30.0,
-            step=1.0,
-        )
-
         configured_maximum_age_at_end = st.number_input(
             "Configured maximum age assumption",
             min_value=1.0,
@@ -416,7 +497,6 @@ with st.sidebar:
         )
     else:
         current_age = None
-        loan_maturity_years = None
         configured_maximum_age_at_end = 75.0
 
 
@@ -431,12 +511,12 @@ scenario = run_affordability_scenario(
     configured_dsti_threshold_percentage=configured_dsti_threshold_percentage,
     use_conservative_income=use_conservative_income,
     conservative_factor=conservative_factor,
-    loan_amount=loan_amount,
+    loan_amount=loan_amount if include_ltv else None,
     acquisition_value=acquisition_value,
     valuation_value=valuation_value,
     configured_ltv_threshold_percentage=configured_ltv_threshold_percentage,
     use_lower_property_value=use_lower_property_value,
-    loan_maturity_years=loan_maturity_years,
+    loan_maturity_years=loan_maturity_years if include_maturity else None,
     current_age=current_age,
     configured_maximum_age_at_end=configured_maximum_age_at_end,
 )
@@ -492,6 +572,128 @@ else:
             "Remaining Capacity",
             format_currency(scenario.dsti.remaining_repayment_capacity),
             "Indicative margin before the configured DSTI threshold.",
+        )
+
+    if interest_rate_build is not None and interest_rate_stress is not None:
+        render_section_title(
+            "Interest Rate Assumptions",
+            "Simulated EURIBOR, spread and stress buffer used to estimate instalments.",
+        )
+
+        rate_col1, rate_col2, rate_col3, rate_col4 = st.columns(4)
+
+        with rate_col1:
+            render_metric_card(
+                "Simulated EURIBOR",
+                format_percentage(interest_rate_build.simulated_euribor_percentage),
+                "Manual educational EURIBOR assumption.",
+            )
+
+        with rate_col2:
+            render_metric_card(
+                "Simulated Spread",
+                format_percentage(interest_rate_build.simulated_spread_percentage),
+                "Manual educational spread assumption.",
+            )
+
+        with rate_col3:
+            render_metric_card(
+                "Base Annual Rate",
+                format_percentage(
+                    interest_rate_build.base_annual_interest_rate_percentage
+                ),
+                "EURIBOR plus spread.",
+            )
+
+        with rate_col4:
+            render_metric_card(
+                "Stressed Annual Rate",
+                format_percentage(
+                    interest_rate_build.stressed_annual_interest_rate_percentage
+                ),
+                "Base rate plus stress buffer.",
+            )
+
+        interest_rate_table = pd.DataFrame(
+            [
+                {
+                    "Metric": "Simulated EURIBOR",
+                    "Value": format_percentage(
+                        interest_rate_build.simulated_euribor_percentage
+                    ),
+                },
+                {
+                    "Metric": "Simulated spread",
+                    "Value": format_percentage(
+                        interest_rate_build.simulated_spread_percentage
+                    ),
+                },
+                {
+                    "Metric": "Stress buffer",
+                    "Value": format_percentage(
+                        interest_rate_build.stress_buffer_percentage
+                    ),
+                },
+                {
+                    "Metric": "Base annual interest rate",
+                    "Value": format_percentage(
+                        interest_rate_build.base_annual_interest_rate_percentage
+                    ),
+                },
+                {
+                    "Metric": "Stressed annual interest rate",
+                    "Value": format_percentage(
+                        interest_rate_build.stressed_annual_interest_rate_percentage
+                    ),
+                },
+                {
+                    "Metric": "Base estimated monthly instalment",
+                    "Value": format_currency(
+                        interest_rate_stress.base_monthly_payment
+                    ),
+                },
+                {
+                    "Metric": "Stressed estimated monthly instalment",
+                    "Value": format_currency(
+                        interest_rate_stress.stressed_monthly_payment
+                    ),
+                },
+                {
+                    "Metric": "Monthly payment increase",
+                    "Value": format_currency(
+                        interest_rate_stress.monthly_payment_increase
+                    ),
+                },
+                {
+                    "Metric": "Monthly payment increase percentage",
+                    "Value": format_percentage(
+                        interest_rate_stress.monthly_payment_increase_percentage
+                    ),
+                },
+                {
+                    "Metric": "Total repayment increase",
+                    "Value": format_currency(
+                        interest_rate_stress.total_repayment_increase
+                    ),
+                },
+            ]
+        )
+
+        st.dataframe(
+            interest_rate_table,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.markdown(
+            f"""
+            <div class="info-card">
+                {interest_rate_build.interpretation}
+                <br><br>
+                {interest_rate_stress.interpretation}
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     render_section_title(
@@ -623,12 +825,12 @@ else:
         configured_dsti_threshold_percentage=configured_dsti_threshold_percentage,
         use_conservative_income=True,
         conservative_factor=conservative_factor,
-        loan_amount=loan_amount,
+        loan_amount=loan_amount if include_ltv else None,
         acquisition_value=acquisition_value,
         valuation_value=valuation_value,
         configured_ltv_threshold_percentage=configured_ltv_threshold_percentage,
         use_lower_property_value=use_lower_property_value,
-        loan_maturity_years=loan_maturity_years,
+        loan_maturity_years=loan_maturity_years if include_maturity else None,
         current_age=current_age,
         configured_maximum_age_at_end=configured_maximum_age_at_end,
     )
@@ -647,6 +849,11 @@ else:
             "credit policy."
         )
         st.write(
+            "EURIBOR, spread and stress buffer values are manually entered "
+            "simulation assumptions. They are not live market data, bank pricing, "
+            "loan offers or financial advice."
+        )
+        st.write(
             "The outputs are educational and indicative only. They must not be "
             "interpreted as credit approval, rejection, eligibility confirmation "
             "or financial advice."
@@ -657,8 +864,9 @@ st.markdown(
     <div class="footer-note">
         This project is educational and demonstrative. It does not use real client
         data, does not process personal documents, does not perform OCR and does
-        not represent any bank's internal credit policy. All values should be
-        fictional, simulated or anonymised.
+        not represent any bank's internal credit policy. EURIBOR, spread and stress
+        values are simulated assumptions only. All values should be fictional,
+        simulated or anonymised.
     </div>
     """,
     unsafe_allow_html=True,
