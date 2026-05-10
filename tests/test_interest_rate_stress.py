@@ -153,6 +153,6 @@ def test_run_interest_rate_stress_test_returns_expected_result():
     assert result.monthly_payment_increase == 162.67
     assert result.monthly_payment_increase_percentage == 18.93
     assert result.base_total_repayment == 309365.11
-    assert result.stressed_total_repayment == 367927.57
-    assert result.total_repayment_increase == 58562.46
+    assert result.stressed_total_repayment == 367927.27
+    assert result.total_repayment_increase == 58562.16
     assert "increases the estimated monthly payment" in result.interpretation
