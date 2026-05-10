@@ -34,6 +34,7 @@ def test_core_modules_import_successfully():
         "interest_rate_stress",
         "euribor_provider",
         "sample_scenario_loader",
+        "commitments_analyzer",
     ]
 
     for module_name in modules:
