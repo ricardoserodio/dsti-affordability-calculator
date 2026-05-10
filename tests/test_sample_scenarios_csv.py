@@ -22,6 +22,7 @@ if str(SRC_PATH) not in sys.path:
 from sample_scenario_loader import (
     REQUIRED_SAMPLE_SCENARIO_COLUMNS,
     load_and_validate_sample_scenarios,
+    validate_structured_commitments_consistency,
 )
 
 
@@ -65,6 +66,39 @@ def test_actual_sample_scenarios_csv_contains_euribor_fields():
     assert "stress_buffer_percentage" in sample_scenarios.columns
 
 
+def test_actual_sample_scenarios_csv_contains_structured_commitment_fields():
+    sample_scenarios, _ = load_and_validate_sample_scenarios()
+
+    assert "housing_commitment" in sample_scenarios.columns
+    assert "auto_loan_commitment" in sample_scenarios.columns
+    assert "personal_loan_commitment" in sample_scenarios.columns
+    assert "credit_card_commitment" in sample_scenarios.columns
+    assert "other_credit_commitments" in sample_scenarios.columns
+    assert "existing_monthly_commitments" in sample_scenarios.columns
+
+
+def test_actual_sample_scenarios_csv_has_consistent_structured_commitments():
+    sample_scenarios, _ = load_and_validate_sample_scenarios()
+
+    validation_result = validate_structured_commitments_consistency(
+        sample_scenarios
+    )
+
+    assert validation_result.is_valid is True
+    assert "Structured commitments are consistent" in validation_result.interpretation
+
+
+def test_actual_sample_scenarios_csv_contains_commitments_scenarios():
+    sample_scenarios, _ = load_and_validate_sample_scenarios()
+
+    scenario_names = set(sample_scenarios["scenario_name"].tolist())
+
+    assert "Higher commitments simulation" in scenario_names
+    assert "High housing commitment simulation" in scenario_names
+    assert "Credit card commitment simulation" in scenario_names
+    assert "No existing commitments simulation" in scenario_names
+
+
 def test_actual_sample_scenarios_csv_has_no_missing_scenario_names():
     sample_scenarios, _ = load_and_validate_sample_scenarios()
 
@@ -91,6 +125,22 @@ def test_actual_sample_scenarios_csv_has_non_negative_stress_buffers():
     sample_scenarios, _ = load_and_validate_sample_scenarios()
 
     assert (sample_scenarios["stress_buffer_percentage"] >= 0).all()
+
+
+def test_actual_sample_scenarios_csv_has_non_negative_commitments():
+    sample_scenarios, _ = load_and_validate_sample_scenarios()
+
+    commitment_columns = [
+        "housing_commitment",
+        "auto_loan_commitment",
+        "personal_loan_commitment",
+        "credit_card_commitment",
+        "other_credit_commitments",
+        "existing_monthly_commitments",
+    ]
+
+    for column in commitment_columns:
+        assert (sample_scenarios[column] >= 0).all()
 
 
 def test_actual_sample_scenarios_csv_has_positive_loan_amounts():
