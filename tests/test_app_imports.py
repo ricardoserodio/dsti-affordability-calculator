@@ -33,6 +33,7 @@ def test_core_modules_import_successfully():
         "interest_rate_builder",
         "interest_rate_stress",
         "euribor_provider",
+        "sample_scenario_loader",
     ]
 
     for module_name in modules:
@@ -59,3 +60,10 @@ def test_github_actions_workflow_exists():
 
     assert workflow_path.exists()
     assert workflow_path.is_file()
+
+
+def test_sample_scenarios_file_exists():
+    sample_scenarios_path = PROJECT_ROOT / "examples" / "sample_scenarios.csv"
+
+    assert sample_scenarios_path.exists()
+    assert sample_scenarios_path.is_file()
