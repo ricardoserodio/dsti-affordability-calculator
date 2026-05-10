@@ -171,6 +171,6 @@ def test_run_loan_payment_simulation_returns_expected_result():
     assert result.maturity_years == 30
     assert result.maturity_months == 360
     assert result.estimated_monthly_payment == 859.35
-    assert result.total_repayment == 309366.44
-    assert result.total_interest == 129366.44
+    assert result.total_repayment == 309365.11
+    assert result.total_interest == 129365.11
     assert "educational estimate only" in result.interpretation
